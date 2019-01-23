@@ -1,0 +1,12 @@
+#!/bin/bash
+# bash colors
+TXTUND=$(tput sgr 0 1)    # Underline
+TXTBLD=$(tput bold)       # Bold
+TXTRED=$(tput setaf 1)    # Red
+TXTGRN=$(tput setaf 2)    # Green
+TXTYLW=$(tput setaf 3)    # Yellow
+TXTBLU=$(tput setaf 4)    # Blue
+TXTPUR=$(tput setaf 5)    # Purple
+TXTCYN=$(tput setaf 6)    # Cyan
+TXTWHT=$(tput setaf 7)    # White
+TXTRST=$(tput sgr0)       # Text reset

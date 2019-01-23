@@ -1,0 +1,49 @@
+#!/bin/bash
+
+################################################################################
+# Utility Functions
+################################################################################
+function go {
+  local box=$1
+  local user="tadms"
+  ssh -o StrictHostKeyChecking=no $user@$box
+}
+
+function show_progress {
+  local count=$1
+  local total=$2
+  echo -ne "Processing [$count/$total]"\\r
+}
+
+function run_on_servers {
+  if [ -z "$1" ] || [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
+    echo "Usage: run_on_servers <ip_list> <\"cmd\">"
+    return 0
+  fi
+  HOST_FILE=$1
+  CMD=$2
+  USER="root"
+  HOSTS=$(cat $HOST_FILE)
+  for HOST in $HOSTS ; do
+    echo "$txtpur------$HOST-------$txtrst"
+    ssh $USER@$HOST "$CMD"
+    echo ""
+  done
+}
+
+function parse_yaml {
+   local prefix=$2
+   local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
+   sed -ne "s|^\($s\):|\1|" \
+        -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
+        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p"  $1 |
+   awk -F$fs '{
+      indent = length($1)/2;
+      vname[indent] = $2;
+      for (i in vname) {if (i > indent) {delete vname[i]}}
+      if (length($3) > 0) {
+         vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
+         printf("%s%s%s=\"%s\"\n", "'$prefix'",vn, $2, $3);
+      }
+   }'
+}
